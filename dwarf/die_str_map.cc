@@ -56,6 +56,11 @@ struct die_str_map::impl
                 : attr(attr), accept(accept.begin(), accept.end()),
                   pos(parent.begin()), end(parent.end()) { }
 
+        impl(const die &parent, DW_AT attr,
+             const std::vector<DW_TAG> &accept)
+                : attr(attr), accept(accept.begin(), accept.end()),
+                  pos(parent.begin()), end(parent.end()) { }
+
         unordered_map<const char*, die, string_hash, string_eq> str_map;
         DW_AT attr;
         unordered_set<DW_TAG> accept;
@@ -65,6 +70,12 @@ struct die_str_map::impl
 
 die_str_map::die_str_map(const die &parent, DW_AT attr,
                          const initializer_list<DW_TAG> &accept)
+        : m(make_shared<impl>(parent, attr, accept))
+{
+}
+
+die_str_map::die_str_map(const die &parent, DW_AT attr,
+                         const std::vector<DW_TAG> &accept)
         : m(make_shared<impl>(parent, attr, accept))
 {
 }

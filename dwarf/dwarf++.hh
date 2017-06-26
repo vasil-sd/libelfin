@@ -1443,6 +1443,9 @@ public:
         die_str_map(const die &parent, DW_AT attr,
                     const std::initializer_list<DW_TAG> &accept);
 
+        die_str_map(const die &parent, DW_AT attr,
+                    const std::vector<DW_TAG> &accept);
+
         die_str_map() = default;
         die_str_map(const die_str_map &o) = default;
         die_str_map(die_str_map &&o) = default;
