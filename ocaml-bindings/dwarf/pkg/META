@@ -1,0 +1,10 @@
+description = "Library for reading DWARF info from ELF files"
+version = "%%VERSION_NUM%%"
+requires = "elf"
+requires += "stdint"
+archive(byte) = "dwarf.cma"
+archive(native) = "dwarf.cmxa"
+plugin(byte) = "dwarf.cma"
+plugin(native) = "dwarf.cmxs"
+
+linkopts = "-cclib -lstdc++"

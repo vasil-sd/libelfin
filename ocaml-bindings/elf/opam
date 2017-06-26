@@ -1,0 +1,22 @@
+opam-version: "1.2"
+name: "elf"
+maintainer: "Vasil Dyadov <vasil.s.d@gmail.com>"
+authors: ["Vasil Dyadov <vasil.s.d@gmail.com>"]
+homepage: "https://github.com/vasil-sd/libelfin.git"
+doc: "https://github.com/vasil-sd/libelfin.git"
+license: "MIT"
+dev-repo: "https://github.com/vasil-sd/libelfin.git"
+bug-reports: "https://github.com/vasil-sd/libelfin.git"
+tags: []
+available: [ ocaml-version >= "4.01.0"]
+depends:
+[
+  "ocamlfind" {build}
+  "ocamlbuild" {build}
+  "topkg" {build & >= "0.9.0"}
+]
+depopts: []
+build:
+[[
+  "ocaml" "pkg/pkg.ml" "build"
+]]

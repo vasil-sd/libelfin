@@ -1,0 +1,5 @@
+true : bin_annot, safe_string, package(bytes), package(elf), package(uint)
+
+<src> : include
+<src/*> : ppx(ocamlfind ocamllint/ppx_lint.native)
+<src/*.c>: ccopt(-x c++), ccopt(-std=c++11), ccopt(-fPIC), cc(/tools/local/gcc-5.2.0/bin/g++)

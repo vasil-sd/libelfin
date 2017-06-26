@@ -1,0 +1,9 @@
+description = "Library for reading ELF files"
+version = "%%VERSION_NUM%%"
+requires = ""
+archive(byte) = "elf.cma"
+archive(native) = "elf.cmxa"
+plugin(byte) = "elf.cma"
+plugin(native) = "elf.cmxs"
+
+linkopts = "-cclib -lstdc++"
