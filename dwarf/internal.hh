@@ -6,7 +6,7 @@
 #define _DWARFPP_INTERNAL_HH_
 
 #include "dwarf++.hh"
-#include "../elf/to_hex.hh"
+#include "to_hex.hh"
 
 #include <stdexcept>
 #include <type_traits>
