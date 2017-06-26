@@ -122,6 +122,12 @@ def make_to_string_mask(typ, arg):
     print("}")
     print("")
 
+def to_ocaml_type_constructor(name):
+    name = name.strip('_').lower()
+    if name.isdigit():
+      name = "Iconst_" + name
+    return name.capitalize()
+
 def make_to_ocaml(typ, arg):
     print("module Enum_%s = struct" % (typ.upper()))
     print("  type t =")
@@ -129,21 +135,21 @@ def make_to_ocaml(typ, arg):
     for key in enums[typ]:
         if key in options.exclude:
             continue
-        print("    | %s" % (key.strip('_').lower().capitalize()))
+        print("    | %s" % (to_ocaml_type_constructor(key)))
     print("")
     print("  let string_of = function")
     print("    | Invalid -> \"Invalid\"")
     for key in enums[typ]:
         if key in options.exclude:
             continue
-        key_ = key.strip('_').lower().capitalize()
+        key_ = to_ocaml_type_constructor(key)
         print("    | %s -> \"%s\"" % (key_, key_))
     print("")
     print("  let of_string = function")
     for key in enums[typ]:
         if key in options.exclude:
             continue
-        key_ = key.strip('_').lower().capitalize()
+        key_ = to_ocaml_type_constructor(key)
         print("    | \"%s\" -> %s" % (key_, key_))
     print("    | _ -> Invalid")
     print("end")
