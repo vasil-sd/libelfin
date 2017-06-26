@@ -62,10 +62,17 @@ def do_top_level(toks, ns=[]):
             arg = toks.pop(0)
             assert toks[0] == ")"
 
-            if typ in options.mask:
-                make_to_string_mask(typ, arg)
+            if options.ocaml:
+                make_to_ocaml(typ, arg)
+            elif options.ocaml_c:
+                make_to_ocaml_c(typ, arg)
+            elif options.ocaml_h:
+                make_to_ocaml_h(typ, arg)
             else:
-                make_to_string(typ, arg)
+                if typ in options.mask:
+                    make_to_string_mask(typ, arg)
+                else:
+                    make_to_string(typ, arg)
 
 def fmt_value(typ, key):
     if options.no_type:
@@ -96,7 +103,7 @@ def make_to_string(typ, arg):
     print("        }")
     print("        return %s;" % expr_remainder(typ, arg))
     print("}")
-    print()
+    print("")
 
 def make_to_string_mask(typ, arg):
     print("std::string")
@@ -113,7 +120,70 @@ def make_to_string_mask(typ, arg):
     print("        else res.pop_back();")
     print("        return res;")
     print("}")
-    print()
+    print("")
+
+def make_to_ocaml(typ, arg):
+    print("module Enum_%s = struct" % (typ.upper()))
+    print("  type t =")
+    print("      Invalid")
+    for key in enums[typ]:
+        if key in options.exclude:
+            continue
+        print("    | %s" % (key.strip('_').lower().capitalize()))
+    print("")
+    print("  let string_of = function")
+    print("    | Invalid -> \"Invalid\"")
+    for key in enums[typ]:
+        if key in options.exclude:
+            continue
+        key_ = key.strip('_').lower().capitalize()
+        print("    | %s -> \"%s\"" % (key_, key_))
+    print("")
+    print("  let of_string = function")
+    for key in enums[typ]:
+        if key in options.exclude:
+            continue
+        key_ = key.strip('_').lower().capitalize()
+        print("    | \"%s\" -> %s" % (key_, key_))
+    print("    | _ -> Invalid")
+    print("end")
+    print("")
+
+def make_to_ocaml_c(typ, arg):
+    print("value")
+    print("value_of_%s (%s %s)" % (typ, typ, arg))
+    print("{")
+    print("        switch (%s) {" % arg)
+    i = 1;
+    for key in enums[typ]:
+        if key in options.exclude:
+            continue
+        print("        case %s::%s: return Val_int(%d);" % \
+            (typ, key, i))
+        i = i + 1
+    print("        }")
+    print("        return Val_int(0);")
+    print("}")
+    print("")
+    print("%s" % (typ))
+    print("%s_of_value (value %s)" % (typ, arg))
+    print("{")
+    print("        switch (Int_val(%s)) {" % arg)
+    i = 1;
+    for key in enums[typ]:
+        if key in options.exclude:
+            continue
+        print("        case %d : return %s::%s;" % \
+            (i, typ, key))
+        i = i + 1
+    print("        }")
+    print("        return (%s)0;" % typ)
+    print("}")
+    print("")
+
+def make_to_ocaml_h(typ, arg):
+    print("value value_of_%s (%s);" % (typ, typ))
+    print("%s %s_of_value (value);" % (typ, typ))
 
 def do_enum_body(name, toks):
     keys = []
@@ -156,6 +226,12 @@ parser.add_option("--no-type", dest="no_type", action="store_true",
                   help="omit type")
 parser.add_option("--mask", dest="mask", action="append",
                   help="treat TYPE as a bit-mask", metavar="TYPE", default=[])
+parser.add_option("--ocaml", dest="ocaml", action="store_true",
+                  help="output Ocaml types of enums", default=False)
+parser.add_option("--ocaml-c", dest="ocaml_c", action="store_true",
+                  help="output Ocaml c-stubs for enums", default=False)
+parser.add_option("--ocaml-h", dest="ocaml_h", action="store_true",
+                  help="output header for Ocaml c-stubs for enums", default=False)
 (options, args) = parser.parse_args()
 if args:
     parser.error("expected 0 arguments")
